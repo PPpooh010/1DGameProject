@@ -1,4 +1,4 @@
-#include "player_movement.h"
+#include "player2_movement.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -6,23 +6,23 @@
 #include <math.h>
 #include <vector>
 
-PlayerMovement::PlayerMovement(sf::Sprite& sprite, sf::Texture& texture , float scale)
-    : playerSprite(sprite), playerTexture(texture), currentFrame(0), frameTime(sf::seconds(0.1f)), isDPressed(false), isAPressed(false)
+Player2Movement::Player2Movement(sf::Sprite& sprite, sf::Texture& texture , float scale)
+    : playerSprite(sprite), playerTexture(texture), currentFrame(0), frameTime(sf::seconds(0.1f)), isRight_Pressed(false), isLeft_Pressed(false)
 {
     playerSprite.setTexture(playerTexture);
     playerSprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
-    playerSprite.setScale(sf::Vector2f(4.5, 4.5));
+    playerSprite.setOrigin(32, 0);
+    playerSprite.setScale(sf::Vector2f(-4.5, 4.5));
 }
 
-void PlayerMovement::moveLeft()
+void Player2Movement::moveLeft2()
 {
-
     int movespeed = 11.f;
     playerSprite.move(-movespeed, 0.f);
 
-    if (!isAPressed) {
-        isAPressed = true;
-        isDPressed = false;
+    if (!isLeft_Pressed) {
+        isLeft_Pressed = true;
+        isRight_Pressed = false;
         frameClock.restart();
         playerSprite.setOrigin(32, 0);
         playerSprite.setScale(sf::Vector2f(-4.5, 4.5));
@@ -35,14 +35,14 @@ void PlayerMovement::moveLeft()
     }
 }
 
-void PlayerMovement::moveRight()
+void Player2Movement::moveRight2()
 {
     int movespeed = 11.f;
     playerSprite.move(movespeed, 0.f);
 
-    if (!isDPressed) {
-        isDPressed = true;
-        isAPressed = false;
+    if (!isRight_Pressed) {
+        isRight_Pressed = true;
+        isLeft_Pressed = false;
         frameClock.restart();
         playerSprite.setOrigin(0, 0);
         playerSprite.setScale(sf::Vector2f(4.5, 4.5));
@@ -55,11 +55,11 @@ void PlayerMovement::moveRight()
     }
 }
 
-void PlayerMovement::update()
+void Player2Movement::update2()
 {
-    if (!isDPressed || !isAPressed) {
-        isDPressed = false; 
-        isAPressed = false; 
+    if (!isRight_Pressed || !isLeft_Pressed) {
+        isLeft_Pressed = false; // รีเซ็ตให้ปุ่ม D ไม่ถูกกดค้าง
+        isRight_Pressed = false; // รีเซ็ตให้ปุ่ม A ไม่ถูกกดค้าง
 
         if (frameClock.getElapsedTime() >= frameTime) {
             frameClock.restart();
