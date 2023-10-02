@@ -106,7 +106,7 @@ public:
 	bool canfly_P1 = true;
 	bool canfly_P2 = true;
 
-	//status
+	//status-------------------------------------------------
 	int point_1;
 	int point_2;
 	float player1HP;
@@ -117,6 +117,7 @@ public:
 	float Stamina_player2;
 	float jump_player1;
 	float jump_player2;
+	
 
 	//skill2 
 	sf::Sprite Skill2_fire_SP1;
@@ -142,6 +143,7 @@ public:
 
 	//ulti
 
+	float scaleulti_up;
 	sf::Clock CD_Ult1_1;
 	sf::Clock scale_ult;
 	sf::Clock animation1_ult;
@@ -208,6 +210,7 @@ public:
 	float scale1_big;
 	float scale2_big;
 
+
 	// rain 
 	sf::Sprite snow_sp;
 	sf::Texture snow_tex;
@@ -219,6 +222,33 @@ public:
 	int frame_snow;
 	bool stun1_on;
 	bool stun2_on;
+
+	//sgow score 
+
+	float score_player1;
+	float score_player2;
+	sf::Clock count_time;
+	int total_damage1;
+	int total_damage2;
+	int time_now;
+
+
+
+	//ulti scale big
+	bool scale_player1_on;
+	float scaleplayer1_up;
+	sf::Clock scaleplayer1_clock;
+	sf::Clock stmina1_drop_clock;
+	float stamina1_drop;
+	bool ultisclae1_use;
+
+
+	bool scale_player2_on;
+	float scaleplayer2_up;
+	sf::Clock scaleplayer2_clock;
+	sf::Clock stmina2_drop_clock;
+	float stamina2_drop;
+	bool ultisclae2_use;
 
 };
 
