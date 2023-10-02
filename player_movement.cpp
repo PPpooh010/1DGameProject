@@ -7,7 +7,7 @@
 #include <vector>
 
 PlayerMovement::PlayerMovement(sf::Sprite& sprite, sf::Texture& texture , float scale)
-    : playerSprite(sprite), playerTexture(texture), currentFrame(0), frameTime(sf::seconds(0.1f)), isDPressed(false), isAPressed(false)
+    : playerSprite(sprite), playerTexture(texture), scale_player(scale) ,currentFrame(0), frameTime(sf::seconds(0.1f)), isDPressed(false), isAPressed(false)
 {
     playerSprite.setTexture(playerTexture);
     playerSprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
@@ -16,7 +16,7 @@ PlayerMovement::PlayerMovement(sf::Sprite& sprite, sf::Texture& texture , float 
 
 void PlayerMovement::moveLeft()
 {
-
+    if(set_scale.getElapsedTime().asSeconds() > 0.5 ) set_scale.restart() , scale = scale_player * 4.5;
     int movespeed = 11.f;
     playerSprite.move(-movespeed, 0.f);
 
@@ -25,7 +25,7 @@ void PlayerMovement::moveLeft()
         isDPressed = false;
         frameClock.restart();
         playerSprite.setOrigin(32, 0);
-        playerSprite.setScale(sf::Vector2f(-4.5, 4.5));
+        playerSprite.setScale(sf::Vector2f(-scale, scale));
     }
 
     if (frameClock.getElapsedTime() >= frameTime) {
@@ -37,6 +37,7 @@ void PlayerMovement::moveLeft()
 
 void PlayerMovement::moveRight()
 {
+    if (set_scale.getElapsedTime().asSeconds() > 0.5) set_scale.restart(), scale = scale_player * 4.5;
     int movespeed = 11.f;
     playerSprite.move(movespeed, 0.f);
 
@@ -45,7 +46,7 @@ void PlayerMovement::moveRight()
         isAPressed = false;
         frameClock.restart();
         playerSprite.setOrigin(0, 0);
-        playerSprite.setScale(sf::Vector2f(4.5, 4.5));
+        playerSprite.setScale(sf::Vector2f(scale, scale));
     }
 
     if (frameClock.getElapsedTime() >= frameTime) {
@@ -57,6 +58,7 @@ void PlayerMovement::moveRight()
 
 void PlayerMovement::update()
 {
+    if (set_scale.getElapsedTime().asSeconds() > 0.5) set_scale.restart(), scale = scale_player * 4.5;
     if (!isDPressed || !isAPressed) {
         isDPressed = false; 
         isAPressed = false; 
