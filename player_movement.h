@@ -15,11 +15,14 @@ public:
     void moveRight();
     void update();
 
+    float scale_player ;
    
 
 private:
     sf::Sprite& playerSprite;
     sf::Texture& playerTexture;
+    sf::Clock set_scale; 
+    float scale;
     int currentFrame;
     sf::Clock frameClock;
     sf::Time frameTime;
