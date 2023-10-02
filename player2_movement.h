@@ -15,13 +15,16 @@ public:
     void moveRight2();
     void update2();
 
+    float scale_player;
 private:
     sf::Sprite& playerSprite;
     sf::Texture& playerTexture;
     int currentFrame;
+    float scale;
     sf::Clock frameClock;
     sf::Time frameTime;
 
+    sf::Clock set_scale; 
     bool isRight_Pressed;
     bool isLeft_Pressed;
 
