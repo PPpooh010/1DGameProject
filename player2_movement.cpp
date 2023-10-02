@@ -7,7 +7,7 @@
 #include <vector>
 
 Player2Movement::Player2Movement(sf::Sprite& sprite, sf::Texture& texture , float scale)
-    : playerSprite(sprite), playerTexture(texture), currentFrame(0), frameTime(sf::seconds(0.1f)), isRight_Pressed(false), isLeft_Pressed(false)
+    : playerSprite(sprite), playerTexture(texture), scale_player(scale), currentFrame(0), frameTime(sf::seconds(0.1f)), isRight_Pressed(false), isLeft_Pressed(false)
 {
     playerSprite.setTexture(playerTexture);
     playerSprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
@@ -17,6 +17,7 @@ Player2Movement::Player2Movement(sf::Sprite& sprite, sf::Texture& texture , floa
 
 void Player2Movement::moveLeft2()
 {
+    if (set_scale.getElapsedTime().asSeconds() > 0.5) scale = scale_player * 4.5, set_scale.restart(); ;
     int movespeed = 11.f;
     playerSprite.move(-movespeed, 0.f);
 
@@ -25,7 +26,7 @@ void Player2Movement::moveLeft2()
         isRight_Pressed = false;
         frameClock.restart();
         playerSprite.setOrigin(32, 0);
-        playerSprite.setScale(sf::Vector2f(-4.5, 4.5));
+        playerSprite.setScale(sf::Vector2f(-scale, scale));
     }
 
     if (frameClock.getElapsedTime() >= frameTime) {
@@ -37,6 +38,7 @@ void Player2Movement::moveLeft2()
 
 void Player2Movement::moveRight2()
 {
+    if (set_scale.getElapsedTime().asSeconds() > 0.5) scale = scale_player * 4.5, set_scale.restart(); ;
     int movespeed = 11.f;
     playerSprite.move(movespeed, 0.f);
 
@@ -45,7 +47,7 @@ void Player2Movement::moveRight2()
         isLeft_Pressed = false;
         frameClock.restart();
         playerSprite.setOrigin(0, 0);
-        playerSprite.setScale(sf::Vector2f(4.5, 4.5));
+        playerSprite.setScale(sf::Vector2f(scale, scale));
     }
 
     if (frameClock.getElapsedTime() >= frameTime) {
@@ -57,6 +59,7 @@ void Player2Movement::moveRight2()
 
 void Player2Movement::update2()
 {
+    if (set_scale.getElapsedTime().asSeconds() > 0.5) scale = scale_player * 4.5, set_scale.restart(); ;
     if (!isRight_Pressed || !isLeft_Pressed) {
         isLeft_Pressed = false; // รีเซ็ตให้ปุ่ม D ไม่ถูกกดค้าง
         isRight_Pressed = false; // รีเซ็ตให้ปุ่ม A ไม่ถูกกดค้าง
