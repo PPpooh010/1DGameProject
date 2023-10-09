@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "main_menu.h"
 #include <math.h>
 #include <vector>
 
@@ -193,18 +194,75 @@ Game::Game(sf::RenderWindow& window)
     score_player2 = 0;
 
 
+
     //scale ultimate 
 
     scale_player1_on = false;
     scaleplayer1_up = 0.2;
-    stamina1_drop = 0.1;
+    stamina1_drop = 0.08;
     ultisclae1_use = true;
 
     scale_player2_on = false;
     scaleplayer2_up = 0.2;
-    stamina2_drop = 0.1;
+    stamina2_drop = 0.08;
     ultisclae2_use = true;
 
+    one = true; 
+    END = false;
+    Delay_on = false;
+    
+    //reset game
+    win1, win2 = 0;
+
+    //sound
+    FireBuffer_sound.loadFromFile("sound_burn.mp3");
+    Fire_sound.setBuffer(FireBuffer_sound);
+    Fire_sound.setVolume(50);
+
+    FireBuffer2_sound.loadFromFile("sound_fire2.mp3");
+    Fire2_sound.setBuffer(FireBuffer2_sound);
+    Fire2_sound.setVolume(50);
+
+    HitBuffer.loadFromFile("hit.mp3");
+    Hit.setBuffer(HitBuffer);
+    Hit.setVolume(50);
+
+    buffBuffer.loadFromFile("buff.mp3");
+    Buff.setBuffer(buffBuffer);
+    Buff.setVolume(50);
+
+    debuffBuffer.loadFromFile("debuff.mp3");
+    debuff.setBuffer(debuffBuffer);
+    debuff.setVolume(30);
+
+    TornadoBuffer.loadFromFile("Tornado.mp3");
+    Tornado.setBuffer(TornadoBuffer);
+    Tornado.setVolume(60);
+
+
+
+    //set heart 
+    
+    heart.loadFromFile("item_drop.png");
+    Win1_player1.setTexture(heart);
+    Win2_player1.setTexture(heart);
+    Win1_player2.setTexture(heart);
+    Win2_player2.setTexture(heart);
+
+    Win1_player1.setTextureRect(sf::IntRect(128,256,32,32));
+    Win2_player1.setTextureRect(sf::IntRect(128,256,32,32));
+    Win1_player2.setTextureRect(sf::IntRect(128,256,32,32));
+    Win2_player2.setTextureRect(sf::IntRect(128,256,32,32));
+    
+    Win1_player1.setScale(1.5 , 1.5);
+    Win2_player1.setScale(1.5 , 1.5);
+    Win1_player2.setScale(1.5 , 1.5);
+    Win2_player2.setScale(1.5 , 1.5);
+
+    Win1_player1.setPosition(338, 15); // * 
+    Win2_player1.setPosition(386,15);//    *
+    Win1_player2.setPosition(900 + 100 ,15); //                   *
+    Win2_player2.setPosition(948 + 100,15); //                       *
     Loop(window);
 }
 
@@ -212,47 +270,50 @@ Game::Game(sf::RenderWindow& window)
 void Game::Update(sf::RenderWindow& window, sf::Event& event)
 {
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) window.close();
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)) main_menu main_menu(window);
 
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed)
             window.close();
     }
 
+    if (oneonly.getElapsedTime().asSeconds() > 1) {
+        one = false;
+    }
     // ukltimtae sikll scale big player 1
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)  && Stamina_player1 >= 99  ){
-        scale_player1_on = true; 
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::O) && Stamina_player1 >= 99) {
+        scale_player1_on = true;
         Stamina_player1 -= 35;
     }
 
     if (scale_player1_on) {
         if (scaleplayer1_clock.getElapsedTime().asSeconds() > 0.2 && scale1_big < 2) {
-            ultisclae1_use = true ; 
+            ultisclae1_use = true;
             scaleplayer1_clock.restart();
             scale1_big += scaleplayer1_up;
             playerMv1->scale_player = scale1_big;
 
-            if(mv1_current == 1 )playerSprite.setScale(4.5 * scale1_big, 4.5 * scale1_big);
-            else if(mv1_current == -1 )playerSprite.setScale(-4.5 * scale1_big, 4.5 * scale1_big) , playerSprite.setOrigin(32,0);
+            if (mv1_current == 1)playerSprite.setScale(4.5 * scale1_big, 4.5 * scale1_big);
+            else if (mv1_current == -1)playerSprite.setScale(-4.5 * scale1_big, 4.5 * scale1_big), playerSprite.setOrigin(32, 0);
 
             playerSprite.setPosition(playerSprite.getPosition().x, playerSprite.getPosition().y - 25);
         }
-        else if(scale1_big >=2 ) {
-            ultisclae1_use = false ; 
+        else if (scale1_big >= 2) {
+            ultisclae1_use = false;
         }
 
         if (stmina1_drop_clock.getElapsedTime().asSeconds() > 0.2 && Stamina_player1 > 5) {
-            Stamina_player1 -= stamina1_drop ;
+            Stamina_player1 -= stamina1_drop;
         }
         else {
             scale_player1_on = false;
             ultisclae1_use = true;
         }
     }
-    else if (scaleplayer1_clock.getElapsedTime().asSeconds() > 0.2 && !scale_player1_on && scale1_big >= 1 && ultisclae1_use ) {
+    else if (scaleplayer1_clock.getElapsedTime().asSeconds() > 0.2 && !scale_player1_on && scale1_big >= 1 && ultisclae1_use) {
         scaleplayer1_clock.restart();
-        scale1_big -= scaleplayer1_up; 
-        if (scale1_big <= 1)ultisclae1_use = false , scale1_big = 1;
+        scale1_big -= scaleplayer1_up;
+        if (scale1_big <= 1)ultisclae1_use = false, scale1_big = 1;
         playerMv1->scale_player = scale1_big;
 
         if (mv1_current == 1)playerSprite.setScale(4.5 * scale1_big, 4.5 * scale1_big);
@@ -300,33 +361,45 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         else if (mv2_current == -1)player2Sprite.setScale(-4.5 * scale2_big, 4.5 * scale2_big), player2Sprite.setOrigin(32, 0);
     }
 
-  //  ---------------------                ultimate scale ;------------------------
-     //show score 
-   
+    //  ---------------------     ultimate scale ;------------------------
+       //show score 
 
-    if (count_time.getElapsedTime().asSeconds() > 1 && isPlayer1Alive && isPlayer2Alive  ) {
-        time_now ++;
+
+    if (count_time.getElapsedTime().asSeconds() > 1 && isPlayer1Alive && isPlayer2Alive) {
+        time_now++;
         count_time.restart();
-        score_player1 += (total_damage1 * 2) ;
-        score_player2 += (total_damage2 * 2) ;
+        score_player1 += (total_damage1 * 2);
+        score_player2 += (total_damage2 * 2);
         total_damage1 = 0;
         total_damage2 = 0;
 
-        printf("ScorePlayer1 = %.2f\n", score_player1 );
-        printf("ScorePlayer2 = %.2f\n", score_player2 );
+        printf("ScorePlayer1 = %.0f\n", score_player1);
+        printf("ScorePlayer2 = %.0f\n", score_player2);
     }
-    else if (!isPlayer1Alive || !isPlayer2Alive) {
-        score_player1 += player1HP * 3;
-        score_player2 += player2HP * 3; 
+    if ((!isPlayer1Alive || !isPlayer2Alive) && END) {
+        score_player1 += player1HP * 4;
+        score_player2 += player2HP * 4;
 
-        score_player1 /= time_now *0.1 ;
-        score_player2 /= time_now *0.1;
-       if(isPlayer1Alive) printf("\n\n The Winner is player1 , score =  %.2f", score_player1 );
-       else if(isPlayer2Alive) printf("\n\n The Winner is player2 , score =  %.2f", score_player2);
+        time_score = time_now / 10;
+
+        score_player1 = score_player1 / time_score;
+        score_player2 = score_player2 / time_score;
+        if (isPlayer1Alive) printf("\n\n The Winner is player1 , score =  %.0f", score_player1);
+        else if (isPlayer2Alive) printf("\n\n The Winner is player2 , score =  %.0f", score_player2);
     }
-  
+    if (END) {
+        Delay_on = true;
+        END = false;
+
+        Delay_end.restart();
+    }
+
+    if (Delay_on && Delay_end.getElapsedTime().asSeconds() > 4) {
+        main_menu main_menu(window);
+    }
+
     //--------------------------Rain snow ------------------------------
-    if (snow_time.getElapsedTime().asSeconds() > 4.2 && isPlayer1Alive && isPlayer2Alive ) {
+    if (snow_time.getElapsedTime().asSeconds() > 4.2 && isPlayer1Alive && isPlayer2Alive) {
         snow_on = true;
         snow_posx = 50 + rand() % 1200;
         snow_posy = -10;
@@ -335,30 +408,29 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
 
     if (snow_on) {
         snow_sp.setPosition(snow_posx, snow_posy);
-        snow_posy += 9.5;
+        snow_posy += 9;
         if (snow_sp.getPosition().y == 900) {
             snow_on = false;
         }
     }
-    if (snow_animation.getElapsedTime().asSeconds() > 0.1 ) {
+    if (snow_animation.getElapsedTime().asSeconds() > 0.09) {
         snow_animation.restart();
         frame_snow = (frame_snow + 1) % 4;
         snow_sp.setTextureRect(sf::IntRect(192 + frame_snow * 32, 416, 32, 32));
     }
-     //--------------------------Rain snow ------------------------------
+    //--------------------------Rain snow ------------------------------
 
 
-    //----------------------Black Hole -------------------------------
-       
+   //----------------------Black Hole -------------------------------
+
     if (CD_blackhole.getElapsedTime().asSeconds() > 8 && isPlayer1Alive && isPlayer2Alive) {
-
         CD_blackhole.restart();
         start_blackhole.restart();
         blackhole_on = true;
     }
     if (blackhole_on) down = 9;
-    else if (!blackhole_on) down =  5;
-    if (start_blackhole.getElapsedTime().asSeconds() > 2.8 ) {
+    else if (!blackhole_on) down = 5;
+    if (start_blackhole.getElapsedTime().asSeconds() > 2.8) {
         blackhole_on = false;
     }
 
@@ -369,8 +441,8 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         ps_x_blackhole = batman_sp.getPosition().x;
         ps_y_blackhole = batman_sp.getPosition().y;
 
-        float speed_blackhole1 = 7 /  scale1_big;
-        float speed_blackhole2 = 7 /  scale2_big; 
+        float speed_blackhole1 = 7 / scale1_big;
+        float speed_blackhole2 = 7 / scale2_big;
         //Q1
         if (ps_x1 >= ps_x_blackhole && ps_y1 <= ps_y_blackhole) playerSprite.move(-speed_blackhole1, speed_blackhole1);
         //Q2
@@ -389,14 +461,14 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         if (ps_x2 >= ps_x_blackhole && ps_y2 >= ps_y_blackhole) player2Sprite.move(-speed_blackhole2, -speed_blackhole2);
         //Q4    
         if (ps_x2 <= ps_x_blackhole && ps_y2 >= ps_y_blackhole) player2Sprite.move(speed_blackhole2, -speed_blackhole2);
-    }           
+    }
 
     //----------------------Black Hole -------------------------------
 
     // -----------------------BATMAN---------------------------------------
-    if (batman_move.getElapsedTime().asSeconds() > 7.9 && isPlayer1Alive && isPlayer2Alive ) {
-        batman_on = true;  
-        gohere_x = 150 +  rand() % 1100 ; 
+    if (batman_move.getElapsedTime().asSeconds() > 7.9 && isPlayer1Alive && isPlayer2Alive) {
+        batman_on = true;
+        gohere_x = 150 + rand() % 1100;
         gohere_y = 130 + rand() % 330;
         scaleup_on = true;
 
@@ -411,7 +483,7 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
             scaleup_on = false;
         }
         if (batgo.getElapsedTime().asSeconds() > 2.9) {
-            if(scalex > 0.2 && scaley > 0.2 ) scalex -= scaleup, scaley -= scaleup;
+            if (scalex > 0.2 && scaley > 0.2) scalex -= scaleup, scaley -= scaleup;
             else {
                 batman_sp.setPosition(-300, -200);
                 batman_on = false;
@@ -419,7 +491,7 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         }
     }
 
-    if( animation_batman.getElapsedTime().asSeconds() > 0.02){
+    if (animation_batman.getElapsedTime().asSeconds() > 0.02) {
         animation_batman.restart();
         current_batman = (current_batman + 1) % 4;
         batman_sp.setTextureRect(sf::IntRect(512 + current_batman * 32, 256, 32, 32));
@@ -430,27 +502,27 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     if (animation1_ult.getElapsedTime().asSeconds() > 0.1 && ult1_open1) {
         animation1_ult.restart();
         current_frame1 = ((current_frame1 + 1) % 4);
-        Ult_1_SP1.setTextureRect(sf::IntRect(192 + current_frame1 * 32 , 0, 32, 32));
+        Ult_1_SP1.setTextureRect(sf::IntRect(192 + current_frame1 * 32, 0, 32, 32));
     }
     if (ult1_open1) {
-    
-       Ult_1_SP1.setPosition(pos_x1_ult, pos_y1_ult -( scale_y1 * 20));
-       Ult_1_SP1.setScale(scale_x1  , scale_y1 );
-       if (current_P1 == 1)  pos_x1_ult += 7.5; 
-       if (current_P1 == -1)  pos_x1_ult -= 7.5;
+
+        Ult_1_SP1.setPosition(pos_x1_ult, pos_y1_ult - (scale_y1 * 20));
+        Ult_1_SP1.setScale(scale_x1, scale_y1);
+        if (current_P1 == 1)  pos_x1_ult += 7.5;
+        if (current_P1 == -1)  pos_x1_ult -= 7.5;
     }
     if (CD_Ult1_1.getElapsedTime().asSeconds() > 4 && ult1_open1) {
         Pressed_I = true;
         ult1_open1 = false;
     }
-    if (scale_ult.getElapsedTime().asSeconds() > 0.0001 && ult1_open1 && scale_x1 <= 14 * scale1_big ) {
+    if (scale_ult.getElapsedTime().asSeconds() > 0.0001 && ult1_open1 && scale_x1 <= 14 * scale1_big) {
         scale_ult.restart();
-        scale_x1 += scaleulti_up ;
+        scale_x1 += scaleulti_up;
         scale_y1 += scaleulti_up;
     }
 
     //--------------------------Ultimate Skill 1 ----------------------------
-    
+
     //-----------------------------Ultimate Skill 1 ---------------------Player2
 
     if (animation2_ult.getElapsedTime().asSeconds() > 0.1 && ult1_open2) {
@@ -460,9 +532,9 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     }
 
     if (ult1_open2) {
-        Ult_1_SP2.setPosition(pos_x2_ult, pos_y2_ult -(scale_y2 * 20));
-        Ult_1_SP2.setScale(scale_x2, scale_y2 );
-      
+        Ult_1_SP2.setPosition(pos_x2_ult, pos_y2_ult - (scale_y2 * 20));
+        Ult_1_SP2.setScale(scale_x2, scale_y2);
+
         if (current_P2 == 1)  pos_x2_ult += 7.5;
         if (current_P2 == -1)  pos_x2_ult -= 7.5;
     }
@@ -472,30 +544,30 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     }
     if (scale2_ult.getElapsedTime().asSeconds() > 0.0001 && ult1_open2 && scale_x2 <= 14 * scale2_big) {
         scale2_ult.restart();
-        scale_x2+= scaleulti_up;
-        scale_y2+= scaleulti_up ;        
+        scale_x2 += scaleulti_up;
+        scale_y2 += scaleulti_up;
     }
     //-----------------------------Ultimate Skill 1 ---------------------Player2
 
     //----------------------------Skill2 player1----------------------------------
     if (use_skill_P1) {
-        Skill2_fire_SP1.setScale(4 * scale1_big, 4 * scale1_big );
-        Press_K = false ;
+        Skill2_fire_SP1.setScale(4 * scale1_big, 4 * scale1_big);
+        Press_K = false;
         Skill2_fire_SP1.setPosition(positionx_skill2_player1, positiony_skill2_player1);
         positiony_skill2_player1 += 13.5;
 
-        if (animation_skill2_P1.getElapsedTime().asSeconds() >= 0.1 ) {  //animation
+        if (animation_skill2_P1.getElapsedTime().asSeconds() >= 0.1) {  //animation
             animation_skill2_P1.restart();
             currentframe_skill2_P1 = ((currentframe_skill2_P1 + 1) % 4);
-            Skill2_fire_SP1.setTextureRect(sf::IntRect(0 , 352 + currentframe_skill2_P1 * 32, 32, 32));
+            Skill2_fire_SP1.setTextureRect(sf::IntRect(0, 352 + currentframe_skill2_P1 * 32, 32, 32));
         }
     }
-    if (Skill2_fire_SP1.getPosition().y > 1200 ) {
+    if (Skill2_fire_SP1.getPosition().y > 1200) {
         Press_K = true;
-        use_skill_P1 = false; 
+        use_skill_P1 = false;
     }
     //----------------------------Skill2 player1----------------------------------
-     
+
     //----------------------------Skill2 ---------player2--------------------------
 
     if (use_skill_P2) {
@@ -517,18 +589,18 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     //----------------------------Skill2 ---------player2--------------------------
 
     // ------------------------Luckey Back alive --------------------------------------
-    if ((!isPlayer1Alive || !isPlayer2Alive) && !start_back_alive && !one_only_alive ) {
+    if ((!isPlayer1Alive || !isPlayer2Alive) && !start_back_alive && !one_only_alive) {
         pos_x = 7 + rand() % 1410;
-        pos_y = -20 ;
+        pos_y = -20;
         start_back_alive = true;
 
         // lucky
         luck_alive = rand() % 3; // 0 1 2 
-        if (luck_alive == 2 && !isPlayer1Alive) pos_x = playerSprite.getPosition().x ;
+        if (luck_alive == 2 && !isPlayer1Alive) pos_x = playerSprite.getPosition().x;
         else if (luck_alive == 2 && !isPlayer2Alive) pos_x = player2Sprite.getPosition().x;
     }
-    if (start_back_alive) {
-        item_alive_sp.setPosition(pos_x,pos_y);
+    if (start_back_alive && !END) {
+        item_alive_sp.setPosition(pos_x, pos_y);
         pos_y = pos_y + 13.5;
     }
     else if (!start_back_alive) {
@@ -536,13 +608,13 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     }
 
     // ------------------------Luckey Back alive --------------------------------------
-    
+
 
     //-------------------------------Item Drop----------------------------------
     if (CD_item_drop.getElapsedTime().asSeconds() > 5 && isPlayer1Alive && isPlayer2Alive) {
-        random_item = rand() % 3 ; // 0 1 2 
-        random_buff = rand() % 2 ; // 0 1  
-        player1Damage = 65 * scale1_big ;
+        random_item = rand() % 3; // 0 1 2 
+        random_buff = rand() % 2; // 0 1  
+        player1Damage = 65 * scale1_big;
         player2Damage = 65 * scale2_big;
         position_x_random = 7 + rand() % 1340;
         item_drop = true;
@@ -557,7 +629,7 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         item3_sp.setTextureRect(sf::IntRect(currentframe_item * 32, 352, 32, 32));
     }
 
-    if (item_drop && position_y_item <= 735 ) {
+    if (item_drop && position_y_item <= 735) {
         if (random_item == 0) { //RED
             item1_sp.setPosition(position_x_random, position_y_item);
         }
@@ -566,9 +638,9 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         }
         if (random_item == 2) {//PURPLE
             item3_sp.setPosition(position_x_random, position_y_item);
-        }     
-        position_y_item += 5 ; 
-   
+        }
+        position_y_item += 5;
+
     }
     if (item_drop && start_item) {
         start_item_end.restart();
@@ -578,7 +650,7 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         item_drop = false;
     }
     if (!item_drop) {
-        position_y_item = -20; 
+        position_y_item = -20;
         if (random_item == 0) item1_sp.setPosition(-100, -200);
         if (random_item == 1) item2_sp.setPosition(-100, -200);
         if (random_item == 2) item3_sp.setPosition(-100, -200);
@@ -589,7 +661,7 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
 
     if (skillCD.getElapsedTime().asSeconds() > 0.5) canUseSkill = true;
     if (skillCD2.getElapsedTime().asSeconds() > 0.5) canUseSkill2 = true;
-    
+
     if (!skill_fire_status) {
         mv1_currentBullet = mv1_current;
     }
@@ -607,42 +679,44 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     if (!blackhole_on && playerSprite.getPosition().y < window.getSize().y - playerSprite.getGlobalBounds().height - 20) {
         playerSprite.setPosition(sf::Vector2f(playerSprite.getPosition().x, playerSprite.getPosition().y + 10));
     }
-    if (!ultisclae1_use && !stun1_on && playerSprite.getPosition().y > 70 &&sf::Keyboard::isKeyPressed(sf::Keyboard::W)&& canfly_P1 && isPlayer1Alive && playerSprite.getPosition().x <= window.getSize().x - 10) {
+    if (!one && !ultisclae1_use && !stun1_on && playerSprite.getPosition().y > 70 && sf::Keyboard::isKeyPressed(sf::Keyboard::W) && canfly_P1 && isPlayer1Alive && playerSprite.getPosition().x <= window.getSize().x - 10) {
         playerSprite.setPosition(sf::Vector2f(playerSprite.getPosition().x, playerSprite.getPosition().y - jump_player1));
     }
     //jump 1
-    if (!ultisclae1_use &&  !stun1_on &&sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::J) && canUseSkill && !skill_fire_status && isPlayer1Alive) {
+    if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::J) && canUseSkill && !skill_fire_status && isPlayer1Alive) {
         skill_fire.setPosition(playerSprite.getPosition());
         skill_fire_status = true;
         canUseSkill = false;
         skillCD.restart();
+        Fire_sound.play();
     }
-    if (!ultisclae1_use &&  !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::J) && canUseSkill && !skill_fire_status && isPlayer1Alive) {
+    if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::J) && canUseSkill && !skill_fire_status && isPlayer1Alive) {
         skill_fire.setPosition(playerSprite.getPosition());
         skill_fire_status = true;
         canUseSkill = false;
         skillCD.restart();
+        Fire_sound.play();
     }
-    if (!ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::S) && isPlayer1Alive && playerSprite.getPosition().y < window.getSize().y - playerSprite.getGlobalBounds().height - 20) {
-        playerSprite.move(sf::Vector2f(0, down ));
+    if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::S) && isPlayer1Alive && playerSprite.getPosition().y < window.getSize().y - playerSprite.getGlobalBounds().height - 20) {
+        playerSprite.move(sf::Vector2f(0, down));
     }
 
     //ult 1
-    
+
     // charge stamina 
 
-    if (!ultisclae1_use &&  !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && isPlayer1Alive) {
+    if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && isPlayer1Alive) {
         canfly_P1 = false;
-        if(Stamina_player1 <= 100 ) Stamina_player1 += 0.30;
+        if (Stamina_player1 <= 100) Stamina_player1 += 0.30 / scale1_big;
         if (player1Dead.getElapsedTime().asSeconds() >= 0.1f) {
             player1Dead.restart();
             currentFrame = ((currentFrame + 1) % 4);
             playerSprite.setTextureRect(sf::IntRect(128 + currentFrame * 32, 0, 32, 32));
         }
     }
-  
-    else if (!ultisclae1_use &&  !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::I) && Stamina_player1 >= 65 && isPlayer1Alive && Pressed_I) {
-        Stamina_player1 = Stamina_player1 - 65;
+
+    else if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::I) && Stamina_player1 >= 65 && isPlayer1Alive && Pressed_I) {
+        Stamina_player1 = Stamina_player1 - 50;
         ult1_open1 = true;
         Pressed_I = false;
         scale_x1 = 3;
@@ -651,35 +725,38 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         pos_y1_ult = playerSprite.getPosition().y;
         current_P1 = mv1_current;
         CD_Ult1_1.restart();
+        Tornado.play();
     }
 
-    else if (!ultisclae1_use &&  !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::K) && Press_K && isPlayer1Alive) { //  Skill2  player 1//
+    else if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::K) && Press_K && isPlayer1Alive) { //  Skill2  player 1//
         positionx_skill2_player1 = player2Sprite.getPosition().x;
         positiony_skill2_player1 = -300;
         use_skill_P1 = true;
         canfly_P1 = true;
+        Fire2_sound.play();
+
     }
-    
-    else if (!ultisclae1_use &&  !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && isPlayer1Alive && playerSprite.getPosition().x <= window.getSize().x - playerSprite.getGlobalBounds().width) {
+
+    else if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && isPlayer1Alive && playerSprite.getPosition().x <= window.getSize().x - playerSprite.getGlobalBounds().width) {
         playerMv1->moveRight();
         mv1_current = 1;
         if (!skill_fire_status) mv1_currentBullet = 1;
         canfly_P1 = true;
     }
 
-    else if (!ultisclae1_use &&  !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && isPlayer1Alive && playerSprite.getPosition().x >= 0)
-         {
+    else if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && isPlayer1Alive && playerSprite.getPosition().x >= 0)
+    {
         playerMv1->moveLeft();
         mv1_current = -1;
         if (!skill_fire_status) mv1_currentBullet = -1;
     }
-
-    else if (!ultisclae1_use &&  !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::J) && canUseSkill && !skill_fire_status && isPlayer1Alive) {  // skill j 
+    else if (!one && !ultisclae1_use && !stun1_on && sf::Keyboard::isKeyPressed(sf::Keyboard::J) && canUseSkill && !skill_fire_status && isPlayer1Alive) {  // skill j 
         skill_fire.setPosition(playerSprite.getPosition());
         skill_fire_status = true;
         canUseSkill = false;
         canfly_P1 = true;
         skillCD.restart();
+        Fire_sound.play();
     }
     else if (isPlayer1Alive) {
         playerMv1->update();
@@ -700,36 +777,39 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     if (!blackhole_on) jump_player2 = 19;
     else if (blackhole_on) jump_player2 = 11;
     //jump2 
-    if ( !blackhole_on && player2Sprite.getPosition().y < window.getSize().y - player2Sprite.getGlobalBounds().height - 20) {
+    if (!blackhole_on && player2Sprite.getPosition().y < window.getSize().y - player2Sprite.getGlobalBounds().height - 20) {
         player2Sprite.setPosition(sf::Vector2f(player2Sprite.getPosition().x, player2Sprite.getPosition().y + 10));
     }
-    if ( !ultisclae2_use &&!stun2_on &&  player2Sprite.getPosition().y > 70 && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)&& canfly_P2 && isPlayer2Alive && player2Sprite.getPosition().x < window.getSize().x + 10) {
+    if (!one && !ultisclae2_use && !stun2_on && player2Sprite.getPosition().y > 70 && sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && canfly_P2 && isPlayer2Alive && player2Sprite.getPosition().x < window.getSize().x + 10) {
         player2Sprite.setPosition(sf::Vector2f(player2Sprite.getPosition().x, player2Sprite.getPosition().y - jump_player2));
     }
-    if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && isPlayer2Alive && player2Sprite.getPosition().y < window.getSize().y - player2Sprite.getGlobalBounds().height - 20) {
+    if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && isPlayer2Alive && player2Sprite.getPosition().y < window.getSize().y - player2Sprite.getGlobalBounds().height - 20) {
         player2Sprite.move(sf::Vector2f(0, down));
     }
-    
+
     //jump2
-    if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1) && canUseSkill2 && !skill_fire2_status && isPlayer2Alive) {
+    if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1) && canUseSkill2 && !skill_fire2_status && isPlayer2Alive) {
         skill_fire2.setPosition(player2Sprite.getPosition());
         skill_fire2_status = true;
         canUseSkill2 = false;
         skillCD2.restart();
+        Fire_sound.play();
+
     }
-    if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1) && canUseSkill2 && !skill_fire2_status && isPlayer2Alive) {
+    if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1) && canUseSkill2 && !skill_fire2_status && isPlayer2Alive) {
         skill_fire2.setPosition(player2Sprite.getPosition());
         skill_fire2_status = true;
         canUseSkill2 = false;
         skillCD2.restart();
+        Fire_sound.play();
     }
-    
+
     //charge stamian player 2
      //ult1 P2 
 
-    if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad0) && isPlayer2Alive) {
-        canfly_P2 = false; 
-        if(Stamina_player2 <= 100)Stamina_player2 += 0.30;
+    if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad0) && isPlayer2Alive) {
+        canfly_P2 = false;
+        if (Stamina_player2 <= 100)Stamina_player2 += 0.30 / scale2_big;
         if (player2Dead.getElapsedTime().asSeconds() >= 0.1f) {
             player2Dead.restart();
             currentFrame2 = ((currentFrame2 + 1) % 4);
@@ -737,8 +817,8 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         }
 
     }
-    else if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4) && Stamina_player2 >= 65 && isPlayer2Alive && Pressed_numpad5) {
-        Stamina_player2 = Stamina_player2 - 65;
+    else if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4) && Stamina_player2 >= 65 && isPlayer2Alive && Pressed_numpad5) {
+        Stamina_player2 = Stamina_player2 - 50;
         ult1_open2 = true;
         Pressed_numpad5 = false;
         scale_x2 = 3;
@@ -747,32 +827,36 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         pos_y2_ult = player2Sprite.getPosition().y;
         current_P2 = mv2_current;
         CD_Ult1_2.restart();
+        Tornado.play();
     }
-    else if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && isPlayer2Alive && player2Sprite.getPosition().x <= window.getSize().x - player2Sprite.getGlobalBounds().width) {
+    else if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && isPlayer2Alive && player2Sprite.getPosition().x <= window.getSize().x - player2Sprite.getGlobalBounds().width) {
         playerMv2->moveRight2();
         mv2_current = 1;
         canfly_P2 = true;
         if (!skill_fire2_status) mv2_currentBullet = 1;
     }
-    else if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2) && Press_num2 && isPlayer2Alive) {  // skil2 player2 //
+    else if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2) && Press_num2 && isPlayer2Alive) {  // skil2 player2 //
         positionx_skill2_player2 = playerSprite.getPosition().x;
         positiony_skill2_player2 = -300;
         canfly_P2 = true;
         use_skill_P2 = true;
+        Fire2_sound.play();
+
     }
-    else if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && isPlayer2Alive && player2Sprite.getPosition().x >= 0) {
+    else if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && isPlayer2Alive && player2Sprite.getPosition().x >= 0) {
         playerMv2->moveLeft2();
         canfly_P2 = true;
         mv2_current = -1;
         if (!skill_fire2_status) mv2_currentBullet = -1;
     }
-   
-    else if (!ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1) && canUseSkill2 && !skill_fire2_status && isPlayer2Alive) {
+
+    else if (!one && !ultisclae2_use && !stun2_on && sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1) && canUseSkill2 && !skill_fire2_status && isPlayer2Alive) {
         skill_fire2.setPosition(player2Sprite.getPosition());
         skill_fire2_status = true;
         canfly_P2 = true;
         canUseSkill2 = false;
         skillCD2.restart();
+        Fire_sound.play();
     }
     else if (isPlayer2Alive) {
         playerMv2->update2();
@@ -811,10 +895,13 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     if (Snow_hitbox.intersects(player1_hitbox)) {
         player1Dead.restart();
         stun1_on = true;
+        snow_on = false;
+        snow_sp.setPosition(-500, -80000);
+        Hit.play();
     }
-    if (player1Dead.getElapsedTime().asSeconds() < 0.8 && stun1_on ) {
+    if (player1Dead.getElapsedTime().asSeconds() < 0.5 && stun1_on && isPlayer1Alive) {
         playerSprite.setTextureRect(sf::IntRect(32, 192, 32, 32));
-        stun1_on =true;
+        stun1_on = true;
     }
 
     else {
@@ -823,9 +910,12 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     if (Snow_hitbox.intersects(player2_hitbox)) {
         player2Dead.restart();
         stun2_on = true;
+        snow_on = false;
+        snow_sp.setPosition(-500, -80000);
+        Hit.play();
     }
 
-    if (player2Dead.getElapsedTime().asSeconds() < 0.8 && stun2_on ) {
+    if (player2Dead.getElapsedTime().asSeconds() < 0.8 && stun2_on && isPlayer2Alive) {
         player2Sprite.setTextureRect(sf::IntRect(32, 192, 32, 32));
         stun2_on = true;
     }
@@ -835,10 +925,12 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
 
     //collision ult 1 
     if (Ult1_P1_hitbox.intersects(player2_hitbox)) {
-        if(player2HP > 0)player2HP -= 6.5 / scale2_big , total_damage1 += 6.5 / scale2_big;
+        if (player2HP > 0)player2HP -= 6.5 / scale2_big, total_damage1 += 6.5 / scale2_big;
+        Hit.play();
     }
     if (Ult1_P2_hitbox.intersects(player1_hitbox)) {
-        if (player1HP > 0)player1HP -= 6.5 / scale1_big  , total_damage2 += 6.5 / scale1_big ;
+        if (player1HP > 0)player1HP -= 6.5 / scale1_big, total_damage2 += 6.5 / scale1_big;
+        Hit.play();
     }
     if (Ult1_P2_hitbox.intersects(skill_frie_hitbox)) {
         skill_fire_status = 0;
@@ -851,24 +943,24 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
 
 
     if (skill2_P1_hitbox.intersects(player2_hitbox)) {
-        if(player2HP > 0 ) player2HP -= (player1Damage / 12 + 8) / scale2_big  , total_damage1 += (player1Damage / 12 + 8) / scale2_big;
+        if (player2HP > 0) player2HP -= (player1Damage / 12 + 8) / scale2_big, total_damage1 += (player1Damage / 12 + 8) / scale2_big, Hit.play();
         if (Stamina_player1 < 100) Stamina_player1 += 0.2 / scale1_big;
     }
     if (skill2_P2_hitbox.intersects(player1_hitbox)) {
-        if (player1HP > 0) player1HP -= (player2Damage / 12 + 8) /scale1_big , total_damage2 += (player2Damage / 12 + 8) / scale1_big;
-        if (Stamina_player2 < 100) Stamina_player2 += 0.2/ scale2_big;
+        if (player1HP > 0) player1HP -= (player2Damage / 12 + 8) / scale1_big, total_damage2 += (player2Damage / 12 + 8) / scale1_big, Hit.play();
+        if (Stamina_player2 < 100) Stamina_player2 += 0.2 / scale2_big;
     }
 
     // skill fire player 1 
     if (skill_fire_status && !skill_frie_hitbox.intersects(player2_hitbox)) {
         if (mv1_currentBullet == 1) {
             skill_fire.setOrigin(0, 0);
-            skill_fire.setScale(3.1 * scale1_big, 3.1* scale1_big);
+            skill_fire.setScale(3.1 * scale1_big, 3.1 * scale1_big);
             skill_fire.setPosition(skill_fire.getPosition() + sf::Vector2f(25, 0));
         }
         else if (mv1_currentBullet == -1) {
             skill_fire.setOrigin(16, 0);
-            skill_fire.setScale(-3.1 * scale1_big , 3.1* scale1_big);
+            skill_fire.setScale(-3.1 * scale1_big, 3.1 * scale1_big);
             skill_fire.setPosition(skill_fire.getPosition() + sf::Vector2f(-25, 0));
         }
 
@@ -889,7 +981,7 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
         }
         if (mv2_currentBullet == -1) {
             skill_fire2.setOrigin(32, 0);
-            skill_fire2.setScale(-3.1 * scale2_big , 3.1 * scale2_big);
+            skill_fire2.setScale(-3.1 * scale2_big, 3.1 * scale2_big);
             skill_fire2.setPosition(skill_fire2.getPosition() + sf::Vector2f(-25, 0));
         }
         if (frameClock2.getElapsedTime() >= frameTime2) {
@@ -898,18 +990,18 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
             skill_fire2.setTextureRect(sf::IntRect(160 + currentFrame2 * 32, 320, 32, 32));
         }
     }
-  
+
     if (skill_frie_hitbox.intersects(player2_hitbox) && skill_fire_status == 1 && isPlayer2Alive) {
-        player2HP -= player1Damage / scale2_big , total_damage1 += player1Damage / scale2_big;
+        player2HP -= player1Damage / scale2_big, total_damage1 += player1Damage / scale2_big, Hit.play();
         if (Stamina_player1 < 100) Stamina_player1 += 0.5;
         skill_fire_status = 0;
     }
     else if (skill_frie_hitbox.intersects(player2_hitbox)) skill_fire_status = 0;
 
     if (skill_frie2_hitbox.intersects(player1_hitbox) && skill_fire2_status == 1 && isPlayer1Alive) {
-        player1HP -= player2Damage / scale1_big , total_damage2 += player2Damage / scale1_big;
+        player1HP -= player2Damage / scale1_big, total_damage2 += player2Damage / scale1_big, Hit.play();
         skill_fire2_status = 0;
-        if (Stamina_player2 < 100) Stamina_player2 += 0.5; 
+        if (Stamina_player2 < 100) Stamina_player2 += 0.5;
     }
     else if (skill_frie2_hitbox.intersects(player1_hitbox)) {
         skill_fire2_status = 0;
@@ -918,60 +1010,130 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     //collision item 
     if (item1_sp_hitbox.intersects(player1_hitbox)) {// red
         item_drop = false;
-        if (random_buff == 0) player1Damage += 25;
-        if (random_buff == 1)player1Damage -= 45;
+        if (random_buff == 0) Buff.play(), player1Damage += 25, printf("Buff\n");
+        if (random_buff == 1) debuff.play(), player1Damage -= 45, printf("DeBuff\n");
     }
+
     if (item2_sp_hitbox.intersects(player1_hitbox)) {//green
         item_drop = false;
-        if (random_buff == 0) if(player1HP < 1350 )player1HP += 200;
-        if (random_buff == 1)if (player1HP > 230) player1HP -= 250;
+        if (random_buff == 0) {
+            Buff.play();
+            player1HP += 200, printf("Buff\n");
+        }
+        if (random_buff == 1) {
+            debuff.play();
+            player1HP -= 250, printf("DeBuff\n");
+        }
     }
     if (item3_sp_hitbox.intersects(player1_hitbox)) {//purple
         item_drop = false;
-        if (random_buff == 0) if (Stamina_player1 < 80 )Stamina_player1 += 20 ;
-        if (random_buff == 1) if(Stamina_player1 > 30)Stamina_player1 -= 30 ;
+        if (random_buff == 0) {
+            Buff.play();
+            Stamina_player1 += 20, printf("Buff\n");
+        }
+        if (random_buff == 1) {
+            debuff.play();
+            Stamina_player1 -= 30, printf("DeBuff\n");
+        }
     }
 
     if (item1_sp_hitbox.intersects(player2_hitbox)) {// red
         item_drop = false;
-        if (random_buff == 0) player2Damage += 25 ;
-        if (random_buff == 1)player2Damage -= 45 ;
+        if (random_buff == 0) player2Damage += 25, Buff.play(), printf("Buff\n");
+        if (random_buff == 1)player2Damage -= 45, debuff.play(), printf("DeBuff\n");
     }
     if (item2_sp_hitbox.intersects(player2_hitbox)) { //green
-        item_drop = false; 
-        if (random_buff == 0) if (player2HP < 1310)player2HP += 200;
-        if (random_buff == 1)if (player2HP > 250) player2HP -= 250;
+        item_drop = false;
+        if (random_buff == 0) {
+            Buff.play();
+            player2HP += 200, printf("Buff\n");
+        }
+        if (random_buff == 1) {
+            debuff.play();
+            player2HP -= 250, printf("DeBuff\n");
+        }
     }
     if (item3_sp_hitbox.intersects(player2_hitbox)) { //purple
         item_drop = false;
-        if (random_buff == 0) if(Stamina_player2 < 80 ) Stamina_player2 += 20;
-        if (random_buff == 1)if (Stamina_player2 > 30) Stamina_player2 -= 30;
+        if (random_buff == 0) {
+            Buff.play();
+            Stamina_player2 += 20, printf("Buff\n");
+        }
+        if (random_buff == 1) {
+            debuff.play();
+            Stamina_player2 -= 30, printf("DeBuff\n");
+        }
     }
 
     //collision back to alive
-    if (item_alive_hitbox.intersects(player1_hitbox))   {
+    if (item_alive_hitbox.intersects(player1_hitbox)) {
         if (!isPlayer1Alive) {
             start_back_alive = false;
             one_only_alive = false;
             isPlayer1Alive = true;
-            player1HP += 200;
+            player1HP += 300;
+            Buff.play();
         }
-        else if (isPlayer1Alive) {
+        else if (isPlayer1Alive && win1 != 2) {
+
             one_only_alive = true;
             start_back_alive = false;
+            // END = true;
+            Buff.play();
+
+            //reset game 
+            win1++;
+            if (win1 != 2) {
+            player2Texture.loadFromFile("player2_dead.png"), playerMv2->playerTexture = player2Texture, player2Sprite.setTexture(player2Texture);
+            isPlayer2Alive = true;
+            start_back_alive = false;
+            one_only_alive = false;
+            player2HP += 1200;
+            }
         }
+        if (win1 == 2) END = true;
     }
+    //ddddddddddddddddd
+    if (item_alive_sp.getPosition().y > 810 && !END && !Delay_on && ( !isPlayer1Alive || !isPlayer2Alive ) ) {
+        if (isPlayer1Alive) win1++;
+        if (isPlayer2Alive) win2++;
+
+        if (win1 != 2 && win2 != 2) {
+            start_back_alive = false;
+            one_only_alive = false;
+            if ( !isPlayer2Alive) player2HP += 1200 ,isPlayer2Alive = true       , player2Texture.loadFromFile("player2_dead.png") , playerMv2->playerTexture = player2Texture , player2Sprite.setTexture(player2Texture) ;
+            else if ( !isPlayer1Alive)  player1HP += 1200, isPlayer1Alive = true , playerTexture.loadFromFile("player1_dead.png") , playerMv1->playerTexture = playerTexture , playerSprite.setTexture(playerTexture) ;
+        }
+        if(win1 == 2 || win2 == 2 )END = true; 
+    }
+    //dddddddddddddddd
+
+    
     if (item_alive_hitbox.intersects(player2_hitbox)) {
         if (!isPlayer2Alive) {
             start_back_alive = false;
             one_only_alive = false;
             isPlayer2Alive = true;
-            player2HP += 200;
+            player2HP += 300;
+            Buff.play();
         }
-        else if (isPlayer2Alive) {
+        else if (isPlayer2Alive && win2 != 2) {
             one_only_alive = true;
             start_back_alive = false;
+           // END = true;
+            Buff.play();
+
+            //reset gmae 
+            win2++;
+            if (win2 != 2) {
+            playerTexture.loadFromFile("player1_dead.png"), playerMv1->playerTexture = playerTexture, playerSprite.setTexture(playerTexture);
+            isPlayer1Alive = true;
+            start_back_alive = false;
+            one_only_alive = false;
+            player1HP += 1200;
+            }
         }
+        if (win2 == 2) END = true;
 
     }
 
@@ -980,15 +1142,19 @@ void Game::Update(sf::RenderWindow& window, sf::Event& event)
     if (player1HP <= 0 && isPlayer1Alive) {
         player1HP = 0;
         isPlayer1Alive = false;
+       
     }
     if (player2HP <= 0 && isPlayer2Alive) {
         player2HP = 0;
         isPlayer2Alive = false;
+    
     }
+    if (player1HP > 3000) player1HP = 3000;
+    if (player2HP > 3000) player2HP = 3000;
 
     //Gui update
 
-
+    
 
     gui.Update(player1HP, player2HP, Stamina_player1 , Stamina_player2);
 }
@@ -1009,7 +1175,12 @@ void Game::Draw(sf::RenderWindow& window)
     if (use_skill_P1) window.draw(Skill2_fire_SP1);
     if (use_skill_P2) window.draw(Skill2_fire_SP2);
     if (snow_on)window.draw(snow_sp);
-    window.draw(batman_sp);
+    if(blackhole_on)window.draw(batman_sp);
+
+    if(win2 >= 0 && win2 < 2)window.draw(Win1_player1);
+    if(win2 >= 0 && win2 < 1)window.draw(Win2_player1);
+    if(win1 >= 0 && win1 < 2)window.draw(Win2_player2);
+    if(win1 >= 0 && win1 < 1)window.draw(Win1_player2);
 
 
     gui.Draw(window);
