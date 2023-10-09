@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "player2_movement.h"
 #include "player_movement.h"
 #include "gui.h"
@@ -223,15 +224,18 @@ public:
 	bool stun1_on;
 	bool stun2_on;
 
-	//sgow score 
+	//show score 
 
 	float score_player1;
 	float score_player2;
 	sf::Clock count_time;
-	int total_damage1;
-	int total_damage2;
-	int time_now;
-
+	float total_damage1;
+	float total_damage2;
+	float time_now;
+	float time_score;
+	bool END;
+	sf::Clock Delay_end;
+	bool Delay_on;
 
 
 	//ulti scale big
@@ -242,7 +246,6 @@ public:
 	float stamina1_drop;
 	bool ultisclae1_use;
 
-
 	bool scale_player2_on;
 	float scaleplayer2_up;
 	sf::Clock scaleplayer2_clock;
@@ -250,5 +253,38 @@ public:
 	float stamina2_drop;
 	bool ultisclae2_use;
 
+	sf::Clock oneonly;
+	bool one; 
+
+	//sound effect
+	sf::SoundBuffer FireBuffer_sound;
+	sf::Sound Fire_sound;
+
+	sf::SoundBuffer FireBuffer2_sound;
+	sf::Sound Fire2_sound;
+
+	sf::SoundBuffer buffBuffer;
+	sf::Sound Buff;
+
+	sf::SoundBuffer debuffBuffer;
+	sf::Sound debuff;
+
+	sf::SoundBuffer HitBuffer;
+	sf::Sound Hit;
+
+	sf::SoundBuffer TornadoBuffer;
+	sf::Sound Tornado;
+	
+	sf::Texture heart; 
+	sf::Sprite Win1_player1;
+	sf::Sprite Win2_player1;
+	sf::Sprite Win1_player2;
+	sf::Sprite Win2_player2; 
+
+	//reset gmae
+
+	int win1;
+	int win2;
+	
 };
 
